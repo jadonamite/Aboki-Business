@@ -12,17 +12,78 @@ export const AuthProvider = ({ children }) => {
    const [user, setUser] = useState(null);
    const [loading, setLoading] = useState(true);
 
+   // ADD THESE MISSING FUNCTIONS:
+   const login = async (email, password) => {
+      try {
+         const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+         });
+
+         const data = await response.json();
+
+         if (response.ok) {
+            if (typeof window !== "undefined") {
+               localStorage.setItem("token", data.token);
+            }
+            setUser(data.user);
+            return { success: true };
+         } else {
+            return { success: false, error: data.message };
+         }
+      } catch (error) {
+         return { success: false, error: "Network error" };
+      }
+   };
+
+   const register = async (userData) => {
+      try {
+         const response = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify(userData),
+         });
+
+         const data = await response.json();
+
+         if (response.ok) {
+            return { success: true };
+         } else {
+            return { success: false, error: data.message };
+         }
+      } catch (error) {
+         return { success: false, error: "Network error" };
+      }
+   };
+
+   const logout = () => {
+      if (typeof window !== "undefined") {
+         localStorage.removeItem("token");
+      }
+      setUser(null);
+   };
+
    // Make checkAuth a useCallback to prevent infinite re-renders
    const checkAuth = useCallback(async () => {
       try {
-         const token = localStorage.getItem("token");
-         if (token) {
-            const userData = await validateToken(token);
-            setUser(userData);
+         if (typeof window !== "undefined") {
+            // Add this check for SSR
+            const token = localStorage.getItem("token");
+            if (token) {
+               const userData = await validateToken(token);
+               setUser(userData);
+            }
          }
       } catch (error) {
          console.error("Auth check failed:", error);
-         localStorage.removeItem("token");
+         if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
+         }
       } finally {
          setLoading(false);
       }
@@ -31,8 +92,6 @@ export const AuthProvider = ({ children }) => {
    useEffect(() => {
       checkAuth();
    }, [checkAuth]); // Now include checkAuth in the dependency array
-
-   // ... rest of your auth functions remain the same
 
    const validateToken = async (token) => {
       const response = await fetch("/api/auth/validate", {
