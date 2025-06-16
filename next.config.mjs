@@ -1,16 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
    reactStrictMode: true,
-   swcMinify: true,
+   // swcMinify: true, ← Remove this line (deprecated in Next.js 15)
    images: {
       domains: ["localhost"],
       formats: ["image/webp", "image/avif"],
    },
-   // Enable experimental features for better performance
    experimental: {
       optimizeCss: true,
    },
-   // PWA configuration (optional)
    async headers() {
       return [
          {
@@ -34,4 +32,4 @@ const nextConfig = {
    },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

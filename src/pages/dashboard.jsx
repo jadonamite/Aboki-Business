@@ -48,9 +48,6 @@ export default function DashboardPage() {
                            alt="Aboki"
                            className="h-8 w-8 mr-2"
                         />
-                        <span className="text-xl font-bold text-gray-900">
-                           Aboki
-                        </span>
                      </div>
 
                      <div className="flex items-center space-x-4">

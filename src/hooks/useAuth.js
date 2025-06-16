@@ -1,4 +1,10 @@
-import { useState, useEffect, useContext, createContext } from "react";
+import {
+   useState,
+   useEffect,
+   useContext,
+   createContext,
+   useCallback,
+} from "react";
 
 const AuthContext = createContext();
 
@@ -6,16 +12,11 @@ export const AuthProvider = ({ children }) => {
    const [user, setUser] = useState(null);
    const [loading, setLoading] = useState(true);
 
-   useEffect(() => {
-      // Check if user is logged in on mount
-      checkAuth();
-   }, []);
-
-   const checkAuth = async () => {
+   // Make checkAuth a useCallback to prevent infinite re-renders
+   const checkAuth = useCallback(async () => {
       try {
          const token = localStorage.getItem("token");
          if (token) {
-            // Validate token with API
             const userData = await validateToken(token);
             setUser(userData);
          }
@@ -25,58 +26,13 @@ export const AuthProvider = ({ children }) => {
       } finally {
          setLoading(false);
       }
-   };
+   }, []); // Empty dependency array since it doesn't depend on any state
 
-   const login = async (email, password) => {
-      try {
-         const response = await fetch("/api/auth/login", {
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-         });
+   useEffect(() => {
+      checkAuth();
+   }, [checkAuth]); // Now include checkAuth in the dependency array
 
-         const data = await response.json();
-
-         if (response.ok) {
-            localStorage.setItem("token", data.token);
-            setUser(data.user);
-            return { success: true };
-         } else {
-            return { success: false, error: data.message };
-         }
-      } catch (error) {
-         return { success: false, error: "Network error" };
-      }
-   };
-
-   const register = async (userData) => {
-      try {
-         const response = await fetch("/api/auth/register", {
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json",
-            },
-            body: JSON.stringify(userData),
-         });
-
-         const data = await response.json();
-
-         if (response.ok) {
-            return { success: true };
-         } else {
-            return { success: false, error: data.message };
-         }
-      } catch (error) {
-         return { success: false, error: "Network error" };
-      }
-   };
-
-   const logout = () => {
-      localStorage.removeItem("token");
-      setUser(null);
-   };
+   // ... rest of your auth functions remain the same
 
    const validateToken = async (token) => {
       const response = await fetch("/api/auth/validate", {
