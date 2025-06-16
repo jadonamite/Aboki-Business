@@ -1,10 +1,36 @@
+// next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
    reactStrictMode: true,
-   // swcMinify: true, ← Remove this line (deprecated in Next.js 15)
+   // Remove this line: swcMinify: false,
    images: {
       domains: ["localhost"],
       formats: ["image/webp", "image/avif"],
+   },
+   experimental: {
+      ...(process.env.NODE_ENV === "production" && {
+         optimizeCss: true,
+      }),
+   },
+   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+      if (!dev && !isServer) {
+         config.optimization = {
+            ...config.optimization,
+            splitChunks: {
+               ...config.optimization.splitChunks,
+               cacheGroups: {
+                  ...config.optimization.splitChunks.cacheGroups,
+                  styles: {
+                     name: "styles",
+                     test: /\.(css|scss|sass)$/,
+                     chunks: "all",
+                     enforce: true,
+                  },
+               },
+            },
+         };
+      }
+      return config;
    },
    async headers() {
       return [
@@ -23,9 +49,17 @@ const nextConfig = {
                   key: "Referrer-Policy",
                   value: "origin-when-cross-origin",
                },
+               {
+                  key: "X-XSS-Protection",
+                  value: "1; mode=block",
+               },
             ],
          },
       ];
+   },
+   onDemandEntries: {
+      maxInactiveAge: 25 * 1000,
+      pagesBufferLength: 2,
    },
 };
 
