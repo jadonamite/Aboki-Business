@@ -4,46 +4,95 @@ import { Button, Input, Checkbox } from "../ui";
 import AuthLayout from "./AuthLayout";
 import { useForm } from "../../hooks/useForm";
 import { validateSignUp } from "../../utils/validation";
+import { useAuth } from "../../hooks/useAuth";
 
 const SignUpForm = () => {
    const router = useRouter();
    const [loading, setLoading] = useState(false);
+   const [successMessage, setSuccessMessage] = useState("");
+   const { register } = useAuth();
 
-   const { values, errors, handleChange, handleSubmit, setError } = useForm({
-      initialValues: {
-         businessName: "",
-         firstName: "",
-         lastName: "",
-         phoneNumber: "",
-         email: "",
-         password: "",
-         agreeToTerms: false,
-      },
-      validationSchema: validateSignUp,
-      onSubmit: async (data) => {
-         setLoading(true);
-         try {
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+   const { values, errors, handleChange, handleSubmit, setError, resetForm } =
+      useForm({
+         initialValues: {
+            businessName: "",
+            firstName: "",
+            lastName: "",
+            phoneNumber: "",
+            email: "",
+            password: "",
+            agreeToTerms: false,
+         },
+         validationSchema: validateSignUp,
+         onSubmit: async (data) => {
+            setLoading(true);
+            setSuccessMessage("");
 
-            // Here you would typically make your API call
-            console.log("Sign up data:", data);
+            try {
+               console.log("Attempting registration with:", data);
 
-            // Redirect to sign in or dashboard
-            router.push("/auth/signin");
-         } catch (error) {
-            setError("email", "An error occurred during sign up");
-         } finally {
-            setLoading(false);
-         }
-      },
-   });
+               const result = await register(data);
+
+               if (result.success) {
+                  console.log("Registration successful");
+                  setSuccessMessage(
+                     result.message || "Account created successfully!"
+                  );
+                  resetForm();
+
+                  // Redirect to sign-in after 2 seconds
+                  setTimeout(() => {
+                     router.push("/auth/signin");
+                  }, 2000);
+               } else {
+                  console.log("Registration failed:", result.error);
+                  setError("email", result.error);
+               }
+            } catch (error) {
+               console.error("Registration error:", error);
+               setError(
+                  "email",
+                  "An unexpected error occurred during registration"
+               );
+            } finally {
+               setLoading(false);
+            }
+         },
+      });
 
    return (
       <AuthLayout
          title="Create Account"
          subtitle="Empower your crypto business">
          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Success Message */}
+            {successMessage && (
+               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center">
+                     <div className="flex-shrink-0">
+                        <svg
+                           className="h-5 w-5 text-green-400"
+                           viewBox="0 0 20 20"
+                           fill="currentColor">
+                           <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                           />
+                        </svg>
+                     </div>
+                     <div className="ml-3">
+                        <p className="text-sm font-medium text-green-800">
+                           {successMessage}
+                        </p>
+                        <p className="text-sm text-green-600 mt-1">
+                           Redirecting to sign in...
+                        </p>
+                     </div>
+                  </div>
+               </div>
+            )}
+
             <Input
                label="Business name"
                name="businessName"
@@ -154,8 +203,8 @@ const SignUpForm = () => {
                type="submit"
                className="w-full"
                loading={loading}
-               disabled={!values.agreeToTerms}>
-               Sign up
+               disabled={!values.agreeToTerms || loading}>
+               {loading ? "Creating account..." : "Sign up"}
             </Button>
 
             <div className="text-center">

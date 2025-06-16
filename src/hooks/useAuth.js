@@ -1,3 +1,4 @@
+// src/hooks/useAuth.js
 import {
    useState,
    useEffect,
@@ -5,6 +6,7 @@ import {
    createContext,
    useCallback,
 } from "react";
+import { useRouter } from "next/router";
 
 const AuthContext = createContext();
 
@@ -12,70 +14,131 @@ export const AuthProvider = ({ children }) => {
    const [user, setUser] = useState(null);
    const [loading, setLoading] = useState(true);
 
-   // ADD THESE MISSING FUNCTIONS:
+   // Mock user database (replace with real API calls)
+   const mockUsers = [
+      {
+         id: 1,
+         email: "admin@aboki.com",
+         password: "password123",
+         firstName: "Admin",
+         lastName: "User",
+         businessName: "Aboki Business",
+      },
+      {
+         id: 2,
+         email: "test@test.com",
+         password: "test123",
+         firstName: "Test",
+         lastName: "User",
+         businessName: "Test Company",
+      },
+   ];
+
    const login = async (email, password) => {
       try {
-         const response = await fetch("/api/auth/login", {
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-         });
+         setLoading(true);
 
-         const data = await response.json();
+         // Simulate API delay
+         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-         if (response.ok) {
+         // Find user in mock database
+         const user = mockUsers.find(
+            (u) => u.email === email && u.password === password
+         );
+
+         if (user) {
+            // Remove password from user object
+            const { password: _, ...userWithoutPassword } = user;
+
+            // Set user in state
+            setUser(userWithoutPassword);
+
+            // Store token in localStorage (browser only)
             if (typeof window !== "undefined") {
-               localStorage.setItem("token", data.token);
+               localStorage.setItem("token", `mock-token-${user.id}`);
+               localStorage.setItem(
+                  "user",
+                  JSON.stringify(userWithoutPassword)
+               );
             }
-            setUser(data.user);
-            return { success: true };
+
+            return { success: true, user: userWithoutPassword };
          } else {
-            return { success: false, error: data.message };
+            return { success: false, error: "Invalid email or password" };
          }
       } catch (error) {
-         return { success: false, error: "Network error" };
+         console.error("Login error:", error);
+         return { success: false, error: "Login failed. Please try again." };
+      } finally {
+         setLoading(false);
       }
    };
 
    const register = async (userData) => {
       try {
-         const response = await fetch("/api/auth/register", {
-            method: "POST",
-            headers: {
-               "Content-Type": "application/json",
-            },
-            body: JSON.stringify(userData),
-         });
+         setLoading(true);
 
-         const data = await response.json();
+         // Simulate API delay
+         await new Promise((resolve) => setTimeout(resolve, 2000));
 
-         if (response.ok) {
-            return { success: true };
-         } else {
-            return { success: false, error: data.message };
+         // Check if user already exists
+         const existingUser = mockUsers.find((u) => u.email === userData.email);
+         if (existingUser) {
+            return {
+               success: false,
+               error: "User with this email already exists",
+            };
          }
+
+         // Create new user
+         const newUser = {
+            id: mockUsers.length + 1,
+            email: userData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            businessName: userData.businessName,
+            // In real app, password would be hashed
+            password: userData.password,
+         };
+
+         // Add to mock database (in real app, this would be an API call)
+         mockUsers.push(newUser);
+
+         console.log("New user registered:", newUser);
+
+         return {
+            success: true,
+            message: "Account created successfully! Please sign in.",
+         };
       } catch (error) {
-         return { success: false, error: "Network error" };
+         console.error("Registration error:", error);
+         return {
+            success: false,
+            error: "Registration failed. Please try again.",
+         };
+      } finally {
+         setLoading(false);
       }
    };
 
    const logout = () => {
+      setUser(null);
       if (typeof window !== "undefined") {
          localStorage.removeItem("token");
+         localStorage.removeItem("user");
       }
-      setUser(null);
    };
 
-   // Make checkAuth a useCallback to prevent infinite re-renders
    const checkAuth = useCallback(async () => {
       try {
+         // Only check localStorage in the browser
          if (typeof window !== "undefined") {
-            // Add this check for SSR
             const token = localStorage.getItem("token");
-            if (token) {
-               const userData = await validateToken(token);
+            const storedUser = localStorage.getItem("user");
+
+            if (token && storedUser) {
+               // In real app, you'd validate the token with your API
+               const userData = JSON.parse(storedUser);
                setUser(userData);
             }
          }
@@ -83,29 +146,16 @@ export const AuthProvider = ({ children }) => {
          console.error("Auth check failed:", error);
          if (typeof window !== "undefined") {
             localStorage.removeItem("token");
+            localStorage.removeItem("user");
          }
       } finally {
          setLoading(false);
       }
-   }, []); // Empty dependency array since it doesn't depend on any state
+   }, []);
 
    useEffect(() => {
       checkAuth();
-   }, [checkAuth]); // Now include checkAuth in the dependency array
-
-   const validateToken = async (token) => {
-      const response = await fetch("/api/auth/validate", {
-         headers: {
-            Authorization: `Bearer ${token}`,
-         },
-      });
-
-      if (response.ok) {
-         return await response.json();
-      } else {
-         throw new Error("Invalid token");
-      }
-   };
+   }, [checkAuth]);
 
    const value = {
       user,
