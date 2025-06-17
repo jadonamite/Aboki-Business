@@ -104,7 +104,7 @@ aboki-business/
 │   │   ├── icons/
 │   │   │   └── logo.svg              # Company logo
 │   │   └── images/
-│   │       └── loginImage.jpg        # Background image
+│   │       └── loginImage.jpg        # und image
 │   └── favicon.ico
 ├── src/
 │   ├── components/
