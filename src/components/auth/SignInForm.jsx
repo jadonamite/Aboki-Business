@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Input } from "../ui";
+import { Button, Input, ToastContainer } from "../ui";
 import AuthLayout from "./AuthLayout";
 import { useForm } from "../../hooks/useForm";
 import { validateSignIn } from "../../utils/validation";
 import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../hooks/useToast";
 
 const SignInForm = () => {
    const router = useRouter();
    const [loading, setLoading] = useState(false);
    const { login } = useAuth();
+   const { toasts, showSuccess, showError, showInfo, hideToast } = useToast();
 
    const { values, errors, handleChange, handleSubmit, setError } = useForm({
       initialValues: {
@@ -19,6 +21,10 @@ const SignInForm = () => {
       validationSchema: validateSignIn,
       onSubmit: async (data) => {
          setLoading(true);
+
+         // Show loading toast
+         const loadingToastId = showInfo("Signing you in...", 2000);
+
          try {
             console.log("Attempting login with:", data);
 
@@ -26,14 +32,36 @@ const SignInForm = () => {
 
             if (result.success) {
                console.log("Login successful:", result);
-               // Redirect to dashboard
-               router.push("/dashboard");
+
+               // Show success toast
+               showSuccess(`Welcome back, ${result.user.firstName}! 🎉`);
+
+               // Small delay to show success message before redirect
+               setTimeout(() => {
+                  router.push("/dashboard");
+               }, 1000);
             } else {
                console.log("Login failed:", result.error);
+
+               // Show specific error messages
+               if (result.error.includes("Invalid email or password")) {
+                  showError(
+                     "❌ Invalid email or password. Please check your credentials."
+                  );
+               } else if (result.error.includes("User not found")) {
+                  showError("❌ No account found with this email address.");
+               } else if (result.error.includes("password")) {
+                  showError("❌ Incorrect password. Please try again.");
+               } else {
+                  showError(`❌ Login failed: ${result.error}`);
+               }
+
+               // Also set form error for field highlighting
                setError("email", result.error);
             }
          } catch (error) {
             console.error("Login error:", error);
+            showError("❌ An unexpected error occurred. Please try again.");
             setError("email", "An unexpected error occurred");
          } finally {
             setLoading(false);
@@ -41,76 +69,160 @@ const SignInForm = () => {
       },
    });
 
+   // Helper function to fill demo credentials
+   const fillDemoCredentials = (email, password) => {
+      handleChange({ target: { name: "email", value: email } });
+      handleChange({ target: { name: "password", value: password } });
+      showInfo('Demo credentials filled! Click "Sign in" to continue.');
+   };
+
    return (
-      <AuthLayout title="Sign in to your account">
-         <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Demo Credentials Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-               <h4 className="font-medium text-blue-900 mb-2">
-                  Demo Credentials
-               </h4>
-               <div className="text-sm text-blue-700 space-y-1">
-                  <p>
-                     <strong>Email:</strong> admin@aboki.com
-                  </p>
-                  <p>
-                     <strong>Password:</strong> password123
-                  </p>
-                  <p className="text-xs mt-2">
-                     Or try: test@test.com / test123
+      <>
+         <AuthLayout title="Sign in to your account">
+            <form onSubmit={handleSubmit} className="space-y-6">
+               {/* Demo Credentials Info */}
+               <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <h4 className="font-medium text-blue-900 mb-3">
+                     🚀 Demo Credentials
+                  </h4>
+                  <div className="space-y-2">
+                     <button
+                        type="button"
+                        onClick={() =>
+                           fillDemoCredentials("admin@aboki.com", "password123")
+                        }
+                        className="w-full text-left bg-white hover:bg-blue-50 border border-blue-200 rounded-md p-2 text-sm transition-colors">
+                        <div className="font-medium text-blue-900">
+                           Admin Account
+                        </div>
+                        <div className="text-blue-600">
+                           admin@aboki.com / password123
+                        </div>
+                     </button>
+
+                     <button
+                        type="button"
+                        onClick={() =>
+                           fillDemoCredentials("test@test.com", "test123")
+                        }
+                        className="w-full text-left bg-white hover:bg-blue-50 border border-blue-200 rounded-md p-2 text-sm transition-colors">
+                        <div className="font-medium text-blue-900">
+                           Test Account
+                        </div>
+                        <div className="text-blue-600">
+                           test@test.com / test123
+                        </div>
+                     </button>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-2">
+                     💡 Click on any credential set to auto-fill the form
                   </p>
                </div>
-            </div>
 
-            <Input
-               label="Email address"
-               name="email"
-               type="email"
-               placeholder="Email address"
-               value={values.email}
-               onChange={handleChange}
-               error={errors.email}
-               required
-            />
-
-            <div>
-               <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                     Password
-                  </label>
-                  <button
-                     type="button"
-                     onClick={() => router.push("/auth/forgot-password")}
-                     className="text-sm text-purple-600 hover:text-purple-700">
-                     Forgot password?
-                  </button>
-               </div>
                <Input
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  value={values.password}
+                  label="Email address"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={values.email}
                   onChange={handleChange}
-                  error={errors.password}
+                  error={errors.email}
                   required
                />
-            </div>
 
-            <Button type="submit" className="w-full" loading={loading}>
-               {loading ? "Signing in..." : "Sign in"}
-            </Button>
+               <div>
+                  <div className="flex items-center justify-between mb-2">
+                     <label className="block text-sm font-medium text-gray-700">
+                        Password
+                     </label>
+                     <button
+                        type="button"
+                        onClick={() => {
+                           showInfo("Password reset feature coming soon! 🔧");
+                        }}
+                        className="text-sm text-purple-600 hover:text-purple-700 transition-colors">
+                        Forgot password?
+                     </button>
+                  </div>
+                  <Input
+                     name="password"
+                     type="password"
+                     placeholder="Enter your password"
+                     value={values.password}
+                     onChange={handleChange}
+                     error={errors.password}
+                     required
+                  />
+               </div>
 
-            <div className="text-center">
-               <span className="text-gray-600">Don't have an account? </span>
-               <button
-                  type="button"
-                  onClick={() => router.push("/auth/signup")}
-                  className="text-purple-600 hover:text-purple-700 font-medium">
-                  Sign up
-               </button>
-            </div>
-         </form>
-      </AuthLayout>
+               <Button
+                  type="submit"
+                  className="w-full"
+                  loading={loading}
+                  disabled={loading}>
+                  {loading ? (
+                     <div className="flex items-center justify-center">
+                        <svg
+                           className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                           xmlns="http://www.w3.org/2000/svg"
+                           fill="none"
+                           viewBox="0 0 24 24">
+                           <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"></circle>
+                           <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Signing in...
+                     </div>
+                  ) : (
+                     "Sign in"
+                  )}
+               </Button>
+
+               {/* Additional Actions */}
+               <div className="flex flex-col space-y-3">
+                  <div className="text-center">
+                     <span className="text-gray-600">
+                        Don't have an account?{" "}
+                     </span>
+                     <button
+                        type="button"
+                        onClick={() => router.push("/auth/signup")}
+                        className="text-purple-600 hover:text-purple-700 font-medium transition-colors">
+                        Sign up
+                     </button>
+                  </div>
+
+                  <div className="text-center">
+                     <button
+                        type="button"
+                        onClick={() =>
+                           showInfo(
+                              "✨ This is a demo authentication system. In production, this would connect to your backend API."
+                           )
+                        }
+                        className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
+                        ℹ️ About this demo
+                     </button>
+                  </div>
+               </div>
+            </form>
+         </AuthLayout>
+
+         {/* Toast Container */}
+         <ToastContainer
+            toasts={toasts}
+            onHideToast={hideToast}
+            position="top-right"
+         />
+      </>
    );
 };
 

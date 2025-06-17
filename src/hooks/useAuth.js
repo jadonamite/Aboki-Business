@@ -41,31 +41,37 @@ export const AuthProvider = ({ children }) => {
          // Simulate API delay
          await new Promise((resolve) => setTimeout(resolve, 1500));
 
-         // Find user in mock database
-         const user = mockUsers.find(
-            (u) => u.email === email && u.password === password
-         );
+         // Check if user exists
+         const userExists = mockUsers.find((u) => u.email === email);
 
-         if (user) {
-            // Remove password from user object
-            const { password: _, ...userWithoutPassword } = user;
-
-            // Set user in state
-            setUser(userWithoutPassword);
-
-            // Store token in localStorage (browser only)
-            if (typeof window !== "undefined") {
-               localStorage.setItem("token", `mock-token-${user.id}`);
-               localStorage.setItem(
-                  "user",
-                  JSON.stringify(userWithoutPassword)
-               );
-            }
-
-            return { success: true, user: userWithoutPassword };
-         } else {
-            return { success: false, error: "Invalid email or password" };
+         if (!userExists) {
+            return {
+               success: false,
+               error: "No account found with this email address",
+            };
          }
+
+         // Check password
+         if (userExists.password !== password) {
+            return {
+               success: false,
+               error: "Incorrect password. Please try again.",
+            };
+         }
+
+         // Login successful
+         const { password: _, ...userWithoutPassword } = userExists;
+
+         // Set user in state
+         setUser(userWithoutPassword);
+
+         // Store token in localStorage (browser only)
+         if (typeof window !== "undefined") {
+            localStorage.setItem("token", `mock-token-${userExists.id}`);
+            localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+         }
+
+         return { success: true, user: userWithoutPassword };
       } catch (error) {
          console.error("Login error:", error);
          return { success: false, error: "Login failed. Please try again." };

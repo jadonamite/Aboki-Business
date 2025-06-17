@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Input, Checkbox } from "../ui";
+import { Button, Input, Checkbox, ToastContainer } from "../ui";
 import AuthLayout from "./AuthLayout";
 import { useForm } from "../../hooks/useForm";
 import { validateSignUp } from "../../utils/validation";
 import { useAuth } from "../../hooks/useAuth";
+import { useToast } from "../../hooks/useToast";
 
 const SignUpForm = () => {
    const router = useRouter();
    const [loading, setLoading] = useState(false);
-   const [successMessage, setSuccessMessage] = useState("");
    const { register } = useAuth();
+   const { toasts, showSuccess, showError, showInfo, showWarning, hideToast } =
+      useToast();
 
    const { values, errors, handleChange, handleSubmit, setError, resetForm } =
       useForm({
@@ -26,7 +28,9 @@ const SignUpForm = () => {
          validationSchema: validateSignUp,
          onSubmit: async (data) => {
             setLoading(true);
-            setSuccessMessage("");
+
+            // Show loading toast
+            showInfo("Creating your account...", 3000);
 
             try {
                console.log("Attempting registration with:", data);
@@ -35,21 +39,48 @@ const SignUpForm = () => {
 
                if (result.success) {
                   console.log("Registration successful");
-                  setSuccessMessage(
-                     result.message || "Account created successfully!"
+
+                  // Show success toast
+                  showSuccess(
+                     `🎉 Welcome to Aboki, ${data.firstName}! Your account has been created successfully.`,
+                     4000
                   );
+
                   resetForm();
 
-                  // Redirect to sign-in after 2 seconds
+                  // Show redirect info
+                  setTimeout(() => {
+                     showInfo("Redirecting you to sign in...", 2000);
+                  }, 1500);
+
+                  // Redirect to sign-in after showing messages
                   setTimeout(() => {
                      router.push("/auth/signin");
-                  }, 2000);
+                  }, 3000);
                } else {
                   console.log("Registration failed:", result.error);
+
+                  // Show specific error messages
+                  if (result.error.includes("already exists")) {
+                     showError(
+                        "❌ An account with this email already exists. Please try signing in instead."
+                     );
+                  } else if (result.error.includes("email")) {
+                     showError("❌ Please provide a valid email address.");
+                  } else if (result.error.includes("password")) {
+                     showError("❌ Password does not meet the requirements.");
+                  } else {
+                     showError(`❌ Registration failed: ${result.error}`);
+                  }
+
+                  // Set form error for field highlighting
                   setError("email", result.error);
                }
             } catch (error) {
                console.error("Registration error:", error);
+               showError(
+                  "❌ An unexpected error occurred during registration. Please try again."
+               );
                setError(
                   "email",
                   "An unexpected error occurred during registration"
@@ -60,164 +91,208 @@ const SignUpForm = () => {
          },
       });
 
+   // Show password requirements info
+   const showPasswordInfo = () => {
+      showInfo(
+         `
+      Password Requirements:
+      • At least 8 characters long
+      • Contains uppercase letter
+      • Contains lowercase letter  
+      • Contains at least one number
+    `,
+         6000
+      );
+   };
+
    return (
-      <AuthLayout
-         title="Create Account"
-         subtitle="Empower your crypto business">
-         <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Success Message */}
-            {successMessage && (
-               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-center">
-                     <div className="flex-shrink-0">
-                        <svg
-                           className="h-5 w-5 text-green-400"
-                           viewBox="0 0 20 20"
-                           fill="currentColor">
-                           <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                           />
-                        </svg>
-                     </div>
-                     <div className="ml-3">
-                        <p className="text-sm font-medium text-green-800">
-                           {successMessage}
-                        </p>
-                        <p className="text-sm text-green-600 mt-1">
-                           Redirecting to sign in...
-                        </p>
-                     </div>
-                  </div>
-               </div>
-            )}
-
-            <Input
-               label="Business name"
-               name="businessName"
-               placeholder="Business name"
-               value={values.businessName}
-               onChange={handleChange}
-               error={errors.businessName}
-               required
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <>
+         <AuthLayout
+            title="Create Account"
+            subtitle="Empower your crypto business">
+            <form onSubmit={handleSubmit} className="space-y-6">
                <Input
-                  label="First name"
-                  name="firstName"
-                  placeholder="First name"
-                  value={values.firstName}
+                  label="Business name"
+                  name="businessName"
+                  placeholder="Enter your business name"
+                  value={values.businessName}
                   onChange={handleChange}
-                  error={errors.firstName}
+                  error={errors.businessName}
                   required
                />
 
-               <Input
-                  label="Last name"
-                  name="lastName"
-                  placeholder="Last name"
-                  value={values.lastName}
-                  onChange={handleChange}
-                  error={errors.lastName}
-                  required
-               />
-            </div>
-
-            <div>
-               <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone number
-               </label>
-               <div className="flex">
-                  <select className="px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                     <option>+234</option>
-                     <option>+1</option>
-                     <option>+44</option>
-                  </select>
-                  <input
-                     type="tel"
-                     name="phoneNumber"
-                     placeholder="Phone number"
-                     value={values.phoneNumber}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                     label="First name"
+                     name="firstName"
+                     placeholder="First name"
+                     value={values.firstName}
                      onChange={handleChange}
-                     className="flex-1 px-4 py-3 border border-l-0 border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                     error={errors.firstName}
+                     required
+                  />
+
+                  <Input
+                     label="Last name"
+                     name="lastName"
+                     placeholder="Last name"
+                     value={values.lastName}
+                     onChange={handleChange}
+                     error={errors.lastName}
+                     required
                   />
                </div>
-               {errors.phoneNumber && (
-                  <p className="mt-2 text-sm text-red-600">
-                     {errors.phoneNumber}
-                  </p>
-               )}
-            </div>
 
-            <Input
-               label="Email address"
-               name="email"
-               type="email"
-               placeholder="Email address"
-               value={values.email}
-               onChange={handleChange}
-               error={errors.email}
-               required
-            />
+               <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                     Phone number
+                  </label>
+                  <div className="flex">
+                     <select className="px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-50 text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors">
+                        <option>+234</option>
+                        <option>+1</option>
+                        <option>+44</option>
+                        <option>+91</option>
+                        <option>+86</option>
+                     </select>
+                     <input
+                        type="tel"
+                        name="phoneNumber"
+                        placeholder="Phone number"
+                        value={values.phoneNumber}
+                        onChange={handleChange}
+                        className="flex-1 px-4 py-3 border border-l-0 border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                     />
+                  </div>
+                  {errors.phoneNumber && (
+                     <p className="mt-2 text-sm text-red-600">
+                        {errors.phoneNumber}
+                     </p>
+                  )}
+               </div>
 
-            <Input
-               label="Password"
-               name="password"
-               type="password"
-               placeholder="Password"
-               value={values.password}
-               onChange={handleChange}
-               error={errors.password}
-               required
-            />
+               <Input
+                  label="Email address"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={values.email}
+                  onChange={handleChange}
+                  error={errors.email}
+                  required
+               />
 
-            <Checkbox
-               label={
-                  <span>
-                     I certify that I am 18 years of age or older, I agree to
-                     the{" "}
-                     <a
-                        href="/terms"
-                        className="text-purple-600 hover:text-purple-700 underline">
-                        Terms of Use
-                     </a>
-                     , and I have read the{" "}
-                     <a
-                        href="/privacy"
-                        className="text-purple-600 hover:text-purple-700 underline">
-                        Privacy Policy
-                     </a>
-                     .
+               <div>
+                  <div className="flex items-center justify-between mb-2">
+                     <label className="block text-sm font-medium text-gray-700">
+                        Password *
+                     </label>
+                     <button
+                        type="button"
+                        onClick={showPasswordInfo}
+                        className="text-sm text-purple-600 hover:text-purple-700 transition-colors">
+                        ℹ️ Requirements
+                     </button>
+                  </div>
+                  <Input
+                     name="password"
+                     type="password"
+                     placeholder="Create a strong password"
+                     value={values.password}
+                     onChange={handleChange}
+                     error={errors.password}
+                     required
+                  />
+               </div>
+
+               <Checkbox
+                  label={
+                     <span>
+                        I certify that I am 18 years of age or older, I agree to
+                        the{" "}
+                        <button
+                           type="button"
+                           onClick={() =>
+                              showInfo(
+                                 "Terms of Use: This is a demo application. In production, this would link to your actual terms."
+                              )
+                           }
+                           className="text-purple-600 hover:text-purple-700 underline transition-colors">
+                           Terms of Use
+                        </button>
+                        , and I have read the{" "}
+                        <button
+                           type="button"
+                           onClick={() =>
+                              showInfo(
+                                 "Privacy Policy: This demo does not collect or store any real user data."
+                              )
+                           }
+                           className="text-purple-600 hover:text-purple-700 underline transition-colors">
+                           Privacy Policy
+                        </button>
+                        .
+                     </span>
+                  }
+                  checked={values.agreeToTerms}
+                  onChange={handleChange}
+                  name="agreeToTerms"
+                  error={errors.agreeToTerms}
+                  required
+               />
+
+               <Button
+                  type="submit"
+                  className="w-full"
+                  loading={loading}
+                  disabled={!values.agreeToTerms || loading}>
+                  {loading ? (
+                     <div className="flex items-center justify-center">
+                        <svg
+                           className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                           xmlns="http://www.w3.org/2000/svg"
+                           fill="none"
+                           viewBox="0 0 24 24">
+                           <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"></circle>
+                           <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Creating account...
+                     </div>
+                  ) : (
+                     "Sign up"
+                  )}
+               </Button>
+
+               <div className="text-center">
+                  <span className="text-gray-600">
+                     Already have an account?{" "}
                   </span>
-               }
-               checked={values.agreeToTerms}
-               onChange={handleChange}
-               name="agreeToTerms"
-               error={errors.agreeToTerms}
-               required
-            />
+                  <button
+                     type="button"
+                     onClick={() => router.push("/auth/signin")}
+                     className="text-purple-600 hover:text-purple-700 font-medium transition-colors">
+                     Sign in
+                  </button>
+               </div>
+            </form>
+         </AuthLayout>
 
-            <Button
-               type="submit"
-               className="w-full"
-               loading={loading}
-               disabled={!values.agreeToTerms || loading}>
-               {loading ? "Creating account..." : "Sign up"}
-            </Button>
-
-            <div className="text-center">
-               <span className="text-gray-600">Already have an account? </span>
-               <button
-                  type="button"
-                  onClick={() => router.push("/auth/signin")}
-                  className="text-purple-600 hover:text-purple-700 font-medium">
-                  Sign in
-               </button>
-            </div>
-         </form>
-      </AuthLayout>
+         {/* Toast Container */}
+         <ToastContainer
+            toasts={toasts}
+            onHideToast={hideToast}
+            position="top-right"
+         />
+      </>
    );
 };
 
