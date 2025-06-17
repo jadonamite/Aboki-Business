@@ -18,7 +18,7 @@ const Checkbox = ({
                   checked={checked}
                   onChange={onChange}
                   className={`
-              h-4 w-4 rounded border-gray-300 text-purple-600 
+              h-4 w-4 rounded border-gray-300 text-purple-500 
               focus:ring-purple-500 focus:ring-2 transition-colors
               ${error ? "border-red-300" : ""}
               ${className}
