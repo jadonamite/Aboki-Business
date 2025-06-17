@@ -43,7 +43,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">
                      {title}
                   </h2>
-                  {subtitle && <p className="text-gray-600">{subtitle}</p>}
+                  {subtitle && <p className="text-gray-500">{subtitle}</p>}
                </div>
 
                <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
