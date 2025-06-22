@@ -37,22 +37,22 @@ export const useToast = () => {
    }, []);
 
    const showSuccess = useCallback(
-      (message, duration) => showToast(message, "success", duration),
+      (message, duration = 5000) => showToast(message, "success", duration),
       [showToast]
    );
 
    const showError = useCallback(
-      (message, duration) => showToast(message, "error", duration),
+      (message, duration = 5000) => showToast(message, "error", duration),
       [showToast]
    );
 
    const showWarning = useCallback(
-      (message, duration) => showToast(message, "warning", duration),
+      (message, duration = 5000) => showToast(message, "warning", duration),
       [showToast]
    );
 
    const showInfo = useCallback(
-      (message, duration) => showToast(message, "info", duration),
+      (message, duration = 5000) => showToast(message, "info", duration),
       [showToast]
    );
 

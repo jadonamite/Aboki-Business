@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 
 // Dynamically import with SSR disabled
-const SignUpForm = dynamic(() => import("../../components/auth/SignUpForm"), {
+const SignInForm = dynamic(() => import("../../components/auth/SignInForm"), {
    ssr: false,
    loading: () => (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -14,22 +14,21 @@ const SignUpForm = dynamic(() => import("../../components/auth/SignUpForm"), {
    ),
 });
 
-export default function SignUpPage() {
+export default function SignInPage() {
    return (
       <>
          <Head>
-            <title>Sign Up - Aboki</title>
-            <meta
-               name="description"
-               content="Create your Aboki account and empower your crypto business"
-            />
+            <title>Sign In - Aboki</title>
+            <meta name="description" content="Sign in to your Aboki account" />
             <meta
                name="viewport"
                content="width=device-width, initial-scale=1"
             />
             <link rel="icon" href="public/assets/icons/logo.svg" />
          </Head>
-         <SignUpForm />
+         <SignInForm />
       </>
    );
 }
+
+<link rel="icon" href="public/assets/icons/logo.svg" />;
