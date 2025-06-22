@@ -6,7 +6,6 @@ import {
    createContext,
    useCallback,
 } from "react";
-import { useRouter } from "next/router";
 
 const AuthContext = createContext();
 
@@ -137,7 +136,7 @@ export const AuthProvider = ({ children }) => {
 
    const checkAuth = useCallback(async () => {
       try {
-         // Only check localStorage in the browser
+         // Only check localStorage in the browser (not during SSR)
          if (typeof window !== "undefined") {
             const token = localStorage.getItem("token");
             const storedUser = localStorage.getItem("user");
