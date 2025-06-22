@@ -30,7 +30,8 @@ const SignUpForm = () => {
             setLoading(true);
 
             // Show loading toast
-            showInfo("Creating your account...", 3000);
+
+            showInfo("Creating your account...", 4000);
 
             try {
                console.log("Attempting registration with:", data);

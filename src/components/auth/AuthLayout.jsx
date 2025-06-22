@@ -22,7 +22,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
             </div>
 
             {/* Content overlay */}
-            <div className="relative z-10 flex flex-col justify-center items-center text-white p-12">
+            <div className="relative z-10 flex flex-col justify-center items-center text-stone-500 p-12">
                {/* <div className="max-w-md text-center">
                   <h1 className="text-4xl font-bold mb-6">
                      Welcome to the Future of Crypto Business

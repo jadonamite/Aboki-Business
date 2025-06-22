@@ -41,12 +41,14 @@ export default function HomePage() {
                content="width=device-width, initial-scale=1"
             />
             <link rel="icon" href="/favicon.ico" />
+            public/assets/icons/logo.svg"
          </Head>
          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-               <h1 className="text-2xl font-bold text-gray-900">
-                  Redirecting...
-               </h1>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
+               <div className="text-center text-white">
+                  <div className="animate-spin rounded-full h-20 w-20 border-b-2 border-white mx-auto mb-4"></div>
+                  <p className="text-lg">Loading...</p>
+               </div>
             </div>
          </div>
       </>
