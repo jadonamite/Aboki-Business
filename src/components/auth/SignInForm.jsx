@@ -36,7 +36,7 @@ const SignInForm = () => {
 
                setTimeout(() => {
                   router.push("/dashboard");
-               }, 2000);
+               }, 1000);
             } else {
                if (result.error.includes("No account found")) {
                   showError("❌ No account found with this email address.");
