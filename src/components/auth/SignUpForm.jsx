@@ -1,3 +1,4 @@
+// src/components/auth/SignUpForm.jsx
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { Button, Input, Checkbox, ToastContainer } from "../ui";
@@ -11,8 +12,7 @@ const SignUpForm = () => {
    const router = useRouter();
    const [loading, setLoading] = useState(false);
    const { register } = useAuth();
-   const { toasts, showSuccess, showError, showInfo, showWarning, hideToast } =
-      useToast();
+   const { toasts, showSuccess, showError, showInfo, hideToast } = useToast();
 
    const { values, errors, handleChange, handleSubmit, setError, resetForm } =
       useForm({
@@ -29,39 +29,26 @@ const SignUpForm = () => {
          onSubmit: async (data) => {
             setLoading(true);
 
-            // Show loading toast
-
-            showInfo("Creating your account...", 4000);
-
             try {
-               console.log("Attempting registration with:", data);
+               showInfo("Creating your account...", 3000);
 
                const result = await register(data);
 
                if (result.success) {
-                  console.log("Registration successful");
-
-                  // Show success toast
                   showSuccess(
                      `🎉 Welcome to Aboki, ${data.firstName}! Your account has been created successfully.`,
                      4000
                   );
-
                   resetForm();
 
-                  // Show redirect info
                   setTimeout(() => {
                      showInfo("Redirecting you to sign in...", 2000);
                   }, 1500);
 
-                  // Redirect to sign-in after showing messages
                   setTimeout(() => {
                      router.push("/auth/signin");
                   }, 3000);
                } else {
-                  console.log("Registration failed:", result.error);
-
-                  // Show specific error messages
                   if (result.error.includes("already exists")) {
                      showError(
                         "❌ An account with this email already exists. Please try signing in instead."
@@ -74,7 +61,6 @@ const SignUpForm = () => {
                      showError(`❌ Registration failed: ${result.error}`);
                   }
 
-                  // Set form error for field highlighting
                   setError("email", result.error);
                }
             } catch (error) {
@@ -92,16 +78,15 @@ const SignUpForm = () => {
          },
       });
 
-   // Show password requirements info
    const showPasswordInfo = () => {
       showInfo(
          `
-      Password Requirements:
-      • At least 8 characters long
-      • Contains uppercase letter
-      • Contains lowercase letter  
-      • Contains at least one number
-    `,
+   Password Requirements:
+   • At least 8 characters long
+   • Contains uppercase letter
+   • Contains lowercase letter  
+   • Contains at least one number
+ `,
          6000
       );
    };
@@ -226,7 +211,7 @@ const SignUpForm = () => {
                            type="button"
                            onClick={() =>
                               showInfo(
-                                 "Privacy Policy: This demo does not collect or store any real user data."
+                                 "Privacy Policy: Aboki does not collect or store any real user data."
                               )
                            }
                            className="text-purple-600 hover:text-purple-700 underline transition-colors">
@@ -288,11 +273,7 @@ const SignUpForm = () => {
          </AuthLayout>
 
          {/* Toast Container */}
-         <ToastContainer
-            toasts={toasts}
-            onHideToast={hideToast}
-            position="top-right"
-         />
+         <ToastContainer toasts={toasts} onHideToast={hideToast} />
       </>
    );
 };

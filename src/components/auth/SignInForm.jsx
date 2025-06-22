@@ -1,6 +1,8 @@
+// src/components/auth/SignInForm.jsx
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Input, ToastContainer } from "../ui";
+import { Button, Input } from "../ui";
+import { ToastContainer } from "../ui/ToastContainer";
 import AuthLayout from "./AuthLayout";
 import { useForm } from "../../hooks/useForm";
 import { validateSignIn } from "../../utils/validation";
@@ -22,41 +24,28 @@ const SignInForm = () => {
       onSubmit: async (data) => {
          setLoading(true);
 
-         // Show loading toast
-         const loadingToastId = showInfo("Signing you in...", 2000);
-
          try {
             console.log("Attempting login with:", data);
+            showInfo("Signing you in...");
 
             const result = await login(data.email, data.password);
 
             if (result.success) {
                console.log("Login successful:", result);
-
-               // Show success toast
                showSuccess(`Welcome back, ${result.user.firstName}! 🎉`);
 
-               // Small delay to show success message before redirect
                setTimeout(() => {
                   router.push("/dashboard");
-               }, 1000);
+               }, 2000);
             } else {
-               console.log("Login failed:", result.error);
-
-               // Show specific error messages
-               if (result.error.includes("Invalid email or password")) {
-                  showError(
-                     "❌ Invalid email or password. Please check your credentials."
-                  );
-               } else if (result.error.includes("User not found")) {
+               if (result.error.includes("No account found")) {
                   showError("❌ No account found with this email address.");
-               } else if (result.error.includes("password")) {
+               } else if (result.error.includes("Incorrect password")) {
                   showError("❌ Incorrect password. Please try again.");
                } else {
                   showError(`❌ Login failed: ${result.error}`);
                }
 
-               // Also set form error for field highlighting
                setError("email", result.error);
             }
          } catch (error) {
@@ -71,8 +60,15 @@ const SignInForm = () => {
 
    // Helper function to fill demo credentials
    const fillDemoCredentials = (email, password) => {
-      handleChange({ target: { name: "email", value: email } });
-      handleChange({ target: { name: "password", value: password } });
+      const emailEvent = {
+         target: { name: "email", value: email, type: "email" },
+      };
+      const passwordEvent = {
+         target: { name: "password", value: password, type: "password" },
+      };
+
+      handleChange(emailEvent);
+      handleChange(passwordEvent);
       showInfo('Demo credentials filled! Click "Sign in" to continue.');
    };
 
@@ -137,9 +133,9 @@ const SignInForm = () => {
                      </label>
                      <button
                         type="button"
-                        onClick={() => {
-                           showInfo("Password reset feature coming soon! 🔧");
-                        }}
+                        onClick={() =>
+                           showInfo("Password reset feature coming soon! 🔧")
+                        }
                         className="text-sm text-purple-600 hover:text-purple-700 transition-colors">
                         Forgot password?
                      </button>
@@ -186,42 +182,20 @@ const SignInForm = () => {
                   )}
                </Button>
 
-               {/* Additional Actions */}
-               <div className="flex flex-col space-y-3">
-                  <div className="text-center">
-                     <span className="text-gray-600">
-                        Don't have an account?{" "}
-                     </span>
-                     <button
-                        type="button"
-                        onClick={() => router.push("/auth/signup")}
-                        className="text-purple-600 hover:text-purple-700 font-medium transition-colors">
-                        Sign up
-                     </button>
-                  </div>
-
-                  <div className="text-center">
-                     <button
-                        type="button"
-                        onClick={() =>
-                           showInfo(
-                              "✨ This is a demo authentication system. In production, this would connect to your backend API."
-                           )
-                        }
-                        className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
-                        ℹ️ About this demo
-                     </button>
-                  </div>
+               <div className="text-center">
+                  <span className="text-gray-600">Don't have an account? </span>
+                  <button
+                     type="button"
+                     onClick={() => router.push("/auth/signup")}
+                     className="text-purple-600 hover:text-purple-700 font-medium transition-colors">
+                     Sign up
+                  </button>
                </div>
             </form>
          </AuthLayout>
 
          {/* Toast Container */}
-         <ToastContainer
-            toasts={toasts}
-            onHideToast={hideToast}
-            position="top-right"
-         />
+         <ToastContainer toasts={toasts} onHideToast={hideToast} />
       </>
    );
 };
