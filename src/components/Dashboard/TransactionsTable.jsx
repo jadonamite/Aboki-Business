@@ -8,18 +8,17 @@ const TransactionRow = ({ transaction }) => {
       Pending: "bg-yellow-100 text-yellow-800 border border-yellow-200",
       Failed: "bg-red-100 text-red-800 border border-red-200",
    };
-
-   const getCryptoIcon = (asset) => {
-      const iconMap = {
-         Bitcoin: { icon: SiBitcoin, color: "from-orange-400 to-yellow-500" },
-         Ethereum: { icon: SiEthereum, color: "from-red-400 to-purple-500" },
-         USDT: { icon: SiTether, color: "from-green-400 to-teal-500" },
-      };
-
-      return (
-         iconMap[asset] || { symbol: "●", color: "from-gray-400 to-gray-500" }
-      );
+   const iconMap = {
+      Bitcoin: { icon: SiBitcoin, color: "from-orange-400 to-yellow-500" },
+      Ethereum: { icon: SiEthereum, color: "from-blue-400 to-purple-500" },
+      USDT: { icon: SiTether, color: "from-green-400 to-teal-500" },
    };
+   // const getCryptoIcon = (asset) => {
+
+   //    return (
+   //       iconMap[asset] || { symbol: "●", color: "from-gray-400 to-gray-500" }
+   //    );
+   // };
    const router = useRouter();
 
    const crypto = iconMap[transaction.asset];

@@ -8,6 +8,7 @@ import {
    CalendarIcon,
 } from "@heroicons/react/24/outline";
 import { SiBitcoin, SiEthereum, SiTether } from "react-icons/si";
+import { MdDashboard, MdOutlineHistory } from "react-icons/md";
 
 const TransactionFilters = ({ onFilterChange }) => {
    const [activeFilter, setActiveFilter] = useState("all");

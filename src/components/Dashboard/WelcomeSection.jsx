@@ -13,7 +13,7 @@ const WelcomeSection = ({ user }) => {
       <div className="flex items-center space-x-4">
          <div className="relative">
             <img
-               src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face"
+               src="/default.jpeg"
                alt="User"
                className="w-16 h-16 rounded-full border-4 border-white shadow-lg"
             />
