@@ -1,17 +1,9 @@
 import {
-   Bars3Icon,
-   XMarkIcon,
-   Cog6ToothIcon as CogIcon,
-   ArrowRightOnRectangleIcon,
-   SparklesIcon,
-} from "@react-icons/hi/24/outline";
-import { MdDashboard, MdOutlineHistory } from "react-icons/md";
-
-import {
    IoLogOutOutline,
    IoSettingsSharp,
    IoWaterSharp,
 } from "react-icons/io5";
+import { MdDashboard, MdOutlineHistory } from "react-icons/md";
 import { HiOutlineXMark } from "react-icons/hi2";
 import { RiExchangeDollarLine } from "react-icons/ri";
 import { useRouter } from "next/router";
