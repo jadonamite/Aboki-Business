@@ -7,7 +7,7 @@ const DashboardLayout = ({ children, user, onLogout }) => {
    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-stone-200 flex">
+      <div className="min-h-screen bg-gray-50 dark:bg-stone-100 flex">
          <Sidebar
             isCollapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}

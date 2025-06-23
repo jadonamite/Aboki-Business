@@ -50,18 +50,23 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, onMobileClose }) => {
       <div className="flex flex-col h-full bg-white">
          {/* Logo Section */}
          <div className="flex items-center justify-between px-6  border-b border-gray-100">
-            {!isCollapsed && (
-               <div className="flex  space-x-3">
-                  <div className="w-20 h-20 relative">
-                     <Image
-                        src="/assets/icons/logo.svg"
-                        alt="Aboki Business Logo"
-                        layout="fill"
-                        objectFit="contain"
-                     />
-                  </div>
+            <div className="flex items-center space-x-3 py-4 transition-all duration-300 ease-in-out">
+               <div
+                  className={`relative ${
+                     isCollapsed || isMobile ? "w-8 h-12" : "w-24 h-12"
+                  } transition-all duration-300`}>
+                  <Image
+                     src={
+                        isCollapsed || isMobile
+                           ? "/assets/icons/abokiicon.svg"
+                           : "/assets/icons/logo.svg"
+                     }
+                     alt="Aboki Logo"
+                     layout="fill"
+                     objectFit="contain"
+                  />
                </div>
-            )}
+            </div>
 
             {isMobile && (
                <button
