@@ -44,9 +44,9 @@ export default function HomePage() {
             public/assets/icons/logo.svg"
          </Head>
          <div className="min-h-screen flex items-center justify-center">
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
+            <div className="min-h-screen flex items-center justify-center ">
                <div className="text-center text-white">
-                  <div className="animate-spin rounded-full h-20 w-20 border-b-2 border-white mx-auto mb-4"></div>
+                  <div className="gradient-spinner-border mx-auto mb-4"></div>
                   <p className="text-lg">Loading...</p>
                </div>
             </div>

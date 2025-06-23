@@ -36,7 +36,7 @@ const ProfileSettings = () => {
       lastName: "Doe",
       email: "jane@aboki.com",
       phone: "+234 801 234 5678",
-      company: "Moniepay",
+      company: "FlyMond",
    });
 
    return (

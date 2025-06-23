@@ -88,7 +88,7 @@ const TopBar = ({ user, onLogout, onSidebarToggle, onMobileMenuToggle }) => {
             </div>
 
             {/* Company Name */}
-            <span className="text-sm font-medium text-gray-900">Moniepay</span>
+            <span className="text-sm font-medium text-gray-900">FlyMond</span>
 
             {/* Profile */}
             <div className="relative">
@@ -96,8 +96,8 @@ const TopBar = ({ user, onLogout, onSidebarToggle, onMobileMenuToggle }) => {
                   onClick={() => setProfileOpen(!profileOpen)}
                   className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500 hover:border-purple-600 transition-colors">
                   <img
-                     src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face"
-                     alt="Profile"
+                     src="/assets/default.jpeg"
+                     alt="Change"
                      className="w-full h-full object-cover"
                   />
                </button>

@@ -1,43 +1,16 @@
 // components/Dashboard/StatCard.jsx
 import React from "react";
-// import {
-//    TrendingUpIcon,
-//    TrendingDownIcon,
-//    UsersIcon,
-//    CubeIcon,
-//    ChartBarIcon,
-//    CurrencyDollarIcon,
-// } from "@heroicons/react/24/outline";
-// // Fallback icons if Heroicons aren't available
-const TrendingUpIcon = ({ className }) => (
-   <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path
-         strokeLinecap="round"
-         strokeLinejoin="round"
-         strokeWidth={2}
-         d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-      />
-   </svg>
-);
 
-const TrendingDownIcon = ({ className }) => (
-   <svg
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path
-         strokeLinecap="round"
-         strokeLinejoin="round"
-         strokeWidth={2}
-         d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
-      />
-   </svg>
-);
+import {
+   IoTrendingUpOutline,
+   IoTrendingDownOutline,
+   IoPeopleOutline, // UsersIcon
+   IoCubeOutline, // CubeIcon
+   IoBarChartOutline, // ChartBarIcon
+   IoCashOutline, // CurrencyDollarIcon
+} from "react-icons/io5";
+import { BsCashCoin } from "react-icons/bs";
+// // Fallback icons if Heroicons aren't available
 
 const UsersIcon = ({ className }) => (
    <svg
@@ -101,13 +74,13 @@ const CurrencyDollarIcon = ({ className }) => (
 
 const StatCard = ({ metric, className = "", style = {} }) => {
    const iconMap = {
-      users: UsersIcon,
-      orders: CubeIcon,
-      volume: ChartBarIcon,
-      earnings: CurrencyDollarIcon,
+      users: IoPeopleOutline,
+      orders: IoCubeOutline,
+      volume: IoBarChartOutline,
+      earnings: BsCashCoin,
    };
 
-   const Icon = iconMap[metric.iconType] || UsersIcon;
+   const Icon = iconMap[metric.iconType] || IoPeopleOutline;
    const isPositive = metric.trend === "up";
 
    // Color schemes for different metrics
@@ -142,9 +115,9 @@ const StatCard = ({ metric, className = "", style = {} }) => {
                <div className="flex items-center space-x-2">
                   <div className="flex items-center space-x-1">
                      {isPositive ? (
-                        <TrendingUpIcon className="w-4 h-4 text-emerald-500" />
+                        <IoTrendingUpOutline className="w-4 h-4 text-emerald-500" />
                      ) : (
-                        <TrendingDownIcon className="w-4 h-4 text-red-500" />
+                        <IoTrendingDownOutline className="w-4 h-4 text-red-500" />
                      )}
                      <span
                         className={`text-sm font-semibold ${

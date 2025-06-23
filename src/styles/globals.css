@@ -2,3 +2,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+.gradient-spinner-border {
+    position: relative;
+    overflow: hidden; 
+}
+  .gradient-spinner-border::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom right, #8B5CF6, #3B82F6); 
+    z-index: -1; 
+    border-radius: 9999px; 
+  }
+
+  .gradient-spinner-border {
+    border-bottom: 2px solid transparent; 
+
+    animation: spin 1s linear infinite; 
+    height: 80px;
+    width: 80px;
+    border-radius: 9999px;
+  }
+  
+ 
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }

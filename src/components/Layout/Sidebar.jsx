@@ -4,7 +4,7 @@ import {
    Cog6ToothIcon as CogIcon,
    ArrowRightOnRectangleIcon,
    SparklesIcon,
-} from "@heroicons/react/24/outline";
+} from "@react-icons/hi/24/outline";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
