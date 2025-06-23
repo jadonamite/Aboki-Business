@@ -40,7 +40,7 @@ export default function HomePage() {
                name="viewport"
                content="width=device-width, initial-scale=1"
             />
-            <link rel="icon" href="public/assets/icons/logo.svg" />
+            <link rel="icon" href="/assets/icons/abokiicon.svg" />
             public/assets/icons/logo.svg"
          </Head>
          <div className="min-h-screen flex items-center justify-center">

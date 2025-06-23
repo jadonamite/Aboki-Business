@@ -9,13 +9,13 @@ import {
    IoBarChartOutline, // ChartBarIcon
    IoCashOutline, // CurrencyDollarIcon
 } from "react-icons/io5";
-import { BsCashCoin } from "react-icons/bs";
+import { BsCashCoin, BsGraphUpArrow } from "react-icons/bs";
 
 const StatCard = ({ metric, className = "", style = {} }) => {
    const iconMap = {
       users: IoPeopleOutline,
       orders: IoCubeOutline,
-      volume: IoBarChartOutline,
+      volume: BsGraphUpArrow,
       earnings: BsCashCoin,
    };
 

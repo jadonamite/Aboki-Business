@@ -49,18 +49,20 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, onMobileClose }) => {
    const sidebarContent = (
       <div className="flex flex-col h-full bg-white">
          {/* Logo Section */}
-         <div className="flex items-center justify-between p-6 border-b border-gray-100">
+         <div className="flex items-center justify-between px-6  border-b border-gray-100">
             {!isCollapsed && (
-               <div className="flex items-center space-x-3">
-                  <Image
-                     src="/assets/icons/logo.svg"
-                     alt="Aboki Business Logo"
-                     width={32}
-                     height={32}
-                     className="flex-shrink-0" // Example class if you need it
-                  />
+               <div className="flex  space-x-3">
+                  <div className="w-20 h-20 relative">
+                     <Image
+                        src="/assets/icons/logo.svg"
+                        alt="Aboki Business Logo"
+                        layout="fill"
+                        objectFit="contain"
+                     />
+                  </div>
                </div>
             )}
+
             {isMobile && (
                <button
                   onClick={onMobileClose}
@@ -81,12 +83,13 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, onMobileClose }) => {
                         ? "bg-purple-600 text-white shadow-lg shadow-purple-600/25"
                         : "text-gray-700 hover:bg-gray-100"
                   }`}>
-                  <span className="text-lg">{item.icon}</span>
+                  <span className="text-lg">
+                     <item.icon />
+                  </span>
                   {!isCollapsed && <span>{item.name}</span>}
                </Link>
             ))}
          </nav>
-
          {/* Logout Section */}
          <div className="p-4 border-t border-gray-100">
             <button className="flex items-center space-x-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors">

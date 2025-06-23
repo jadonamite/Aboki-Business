@@ -1,3 +1,6 @@
+import { MdDashboard } from "react-icons/md";
+import { useRouter } from "next/router";
+
 const TransactionRow = ({ transaction }) => {
    const statusColors = {
       Success: "bg-emerald-100 text-emerald-800 border border-emerald-200",
@@ -15,7 +18,7 @@ const TransactionRow = ({ transaction }) => {
          iconMap[asset] || { symbol: "●", color: "from-gray-400 to-gray-500" }
       );
    };
-
+   const router = useRouter(); // Add this inside your component
    const crypto = getCryptoIcon(transaction.asset);
 
    return (
@@ -68,7 +71,10 @@ const TransactionsTable = ({ transactions = [] }) => {
                <h2 className="text-xl font-bold text-gray-900">
                   Recent Transactions
                </h2>
-               <button className="text-sm text-purple-600 hover:text-purple-700 font-medium">
+
+               <button
+                  onClick={() => router.push("/transactions")}
+                  className="text-sm text-purple-600 hover:text-purple-700 font-medium">
                   View all
                </button>
             </div>
@@ -77,7 +83,7 @@ const TransactionsTable = ({ transactions = [] }) => {
          {transactions.length === 0 ? (
             <div className="p-12 text-center">
                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-2xl">📊</span>
+                  <span className="text-2xl">{MdDashboard}</span>
                </div>
                <h3 className="text-lg font-medium text-gray-900 mb-2">
                   No transactions yet
