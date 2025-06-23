@@ -1,4 +1,5 @@
 import { MdDashboard } from "react-icons/md";
+import { SiBitcoin, SiEthereum, SiTether } from "react-icons/si";
 import { useRouter } from "next/router";
 
 const TransactionRow = ({ transaction }) => {
@@ -10,16 +11,19 @@ const TransactionRow = ({ transaction }) => {
 
    const getCryptoIcon = (asset) => {
       const iconMap = {
-         Bitcoin: { symbol: "₿", color: "from-orange-400 to-yellow-500" },
-         Ethereum: { symbol: "Ξ", color: "from-blue-400 to-purple-500" },
-         USDT: { symbol: "₮", color: "from-green-400 to-teal-500" },
+         Bitcoin: { icon: SiBitcoin, color: "from-orange-400 to-yellow-500" },
+         Ethereum: { icon: SiEthereum, color: "from-red-400 to-purple-500" },
+         USDT: { icon: SiTether, color: "from-green-400 to-teal-500" },
       };
+
       return (
          iconMap[asset] || { symbol: "●", color: "from-gray-400 to-gray-500" }
       );
    };
-   const router = useRouter(); // Add this inside your component
-   const crypto = getCryptoIcon(transaction.asset);
+   const router = useRouter();
+
+   const crypto = iconMap[transaction.asset];
+   const CryptoIcon = crypto?.icon;
 
    return (
       <tr className="hover:bg-gray-50 transition-colors">
@@ -29,8 +33,8 @@ const TransactionRow = ({ transaction }) => {
          <td className="px-6 py-4 whitespace-nowrap">
             <div className="flex items-center space-x-3">
                <div
-                  className={`w-8 h-8 rounded-full bg-gradient-to-br ${crypto.color} flex items-center justify-center text-white font-bold text-sm shadow-sm`}>
-                  {crypto.symbol}
+                  className={`w-8 h-8 rounded-full bg-gradient-to-br ${crypto.color} flex items-center justify-center text-white shadow-sm`}>
+                  {CryptoIcon && <CryptoIcon className="w-4 h-4" />}
                </div>
                <span className="text-sm font-medium text-gray-900">
                   {transaction.asset}

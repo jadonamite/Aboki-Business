@@ -7,6 +7,7 @@ import {
    ArrowDownTrayIcon,
    CalendarIcon,
 } from "@heroicons/react/24/outline";
+import { SiBitcoin, SiEthereum, SiTether } from "react-icons/si";
 
 const TransactionFilters = ({ onFilterChange }) => {
    const [activeFilter, setActiveFilter] = useState("all");
@@ -80,10 +81,11 @@ const TransactionCard = ({ transaction }) => {
 
    const getCryptoIcon = (asset) => {
       const iconMap = {
-         Bitcoin: { symbol: "₿", color: "from-orange-400 to-yellow-500" },
-         Ethereum: { symbol: "Ξ", color: "from-blue-400 to-purple-500" },
-         USDT: { symbol: "₮", color: "from-green-400 to-teal-500" },
+         Bitcoin: { icon: SiBitcoin, color: "from-orange-400 to-yellow-500" },
+         Ethereum: { icon: SiEthereum, color: "from-blue-400 to-purple-500" },
+         USDT: { icon: SiTether, color: "from-green-400 to-teal-500" },
       };
+
       return (
          iconMap[asset] || { symbol: "●", color: "from-gray-400 to-gray-500" }
       );
@@ -247,7 +249,7 @@ const TransactionsPage = () => {
                {filteredTransactions.length === 0 && (
                   <div className="text-center py-12">
                      <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                        <span className="text-2xl">📊</span>
+                        <span className="text-2xl">{MdDashboard}</span>
                      </div>
                      <h3 className="text-lg font-medium text-gray-900 mb-2">
                         No transactions found

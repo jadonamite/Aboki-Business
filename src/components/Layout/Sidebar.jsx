@@ -28,13 +28,13 @@ const Sidebar = ({ isCollapsed, onToggle, isMobile, onMobileClose }) => {
       },
       {
          name: "Exchange",
-         href: "/exchange",
+         href: "#exchange",
          active: router.pathname === "#exchange",
          icon: RiExchangeDollarLine,
       },
       {
          name: "Liquidity",
-         href: "/liquidity",
+         href: "#liquidity",
          active: router.pathname === "#liquidity",
          icon: IoWaterSharp,
       },
