@@ -12,6 +12,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
    const [user, setUser] = useState(null);
    const [loading, setLoading] = useState(true);
+   const [mounted, setMounted] = useState(false);
 
    // Mock user database (replace with real API calls)
    const [mockUsers, setMockUsers] = useState([
@@ -35,6 +36,11 @@ export const AuthProvider = ({ children }) => {
       },
    ]);
 
+   // Handle client-side mounting
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
    const updateUser = async (updatedData) => {
       try {
          if (!user) return { success: false, error: "No user logged in" };
@@ -52,8 +58,8 @@ export const AuthProvider = ({ children }) => {
          const updatedUser = { ...user, ...updatedData };
          setUser(updatedUser);
 
-         // Update localStorage
-         if (typeof window !== "undefined") {
+         // Update localStorage only after component is mounted
+         if (mounted && typeof window !== "undefined") {
             localStorage.setItem("user", JSON.stringify(updatedUser));
          }
 
@@ -95,8 +101,8 @@ export const AuthProvider = ({ children }) => {
          // Set user in state
          setUser(userWithoutPassword);
 
-         // Store token in localStorage (browser only)
-         if (typeof window !== "undefined") {
+         // Store token in localStorage only after component is mounted
+         if (mounted && typeof window !== "undefined") {
             localStorage.setItem("token", `mock-token-${userExists.id}`);
             localStorage.setItem("user", JSON.stringify(userWithoutPassword));
          }
@@ -139,7 +145,7 @@ export const AuthProvider = ({ children }) => {
          };
 
          // Add to mock database
-         setMockUsers(prev => [...prev, newUser]);
+         setMockUsers((prev) => [...prev, newUser]);
 
          console.log("New user registered:", newUser);
 
@@ -161,7 +167,7 @@ export const AuthProvider = ({ children }) => {
 
    const logout = () => {
       setUser(null);
-      if (typeof window !== "undefined") {
+      if (mounted && typeof window !== "undefined") {
          localStorage.removeItem("token");
          localStorage.removeItem("user");
       }
@@ -169,8 +175,8 @@ export const AuthProvider = ({ children }) => {
 
    const checkAuth = useCallback(async () => {
       try {
-         // Only check localStorage in the browser (not during SSR)
-         if (typeof window !== "undefined") {
+         // Only check localStorage after component is mounted and in browser
+         if (mounted && typeof window !== "undefined") {
             const token = localStorage.getItem("token");
             const storedUser = localStorage.getItem("user");
 
@@ -182,18 +188,24 @@ export const AuthProvider = ({ children }) => {
          }
       } catch (error) {
          console.error("Auth check failed:", error);
-         if (typeof window !== "undefined") {
+         if (mounted && typeof window !== "undefined") {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
          }
       } finally {
          setLoading(false);
       }
-   }, []);
+   }, [mounted]);
 
+   // Only run auth check after component is mounted
    useEffect(() => {
-      checkAuth();
-   }, [checkAuth]);
+      if (mounted) {
+         checkAuth();
+      } else {
+         // On server-side, just set loading to false
+         setLoading(false);
+      }
+   }, [mounted, checkAuth]);
 
    const value = {
       user,
