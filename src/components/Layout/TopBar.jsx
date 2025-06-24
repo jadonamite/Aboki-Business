@@ -54,12 +54,12 @@ const ProfileDropdown = ({ isOpen, onClose, user, onLogout }) => {
             <UserCircleIcon className="w-4 h-4 mr-3" />
             Profile
          </a>
-         <a
+         <button
             onClick={() => router.push("/settings")}
-            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
             <CogIcon className="w-4 h-4 mr-3" />
             Settings
-         </a>
+         </button>
          <div className="border-t border-gray-200 my-1"></div>
          <button
             onClick={onLogout}
@@ -77,6 +77,8 @@ const TopBar = ({
    onSidebarToggle,
    onMobileMenuToggle,
    sidebarCollapsed,
+   testMode,
+   onTestModeToggle,
 }) => {
    const [profileOpen, setProfileOpen] = useState(false);
 
@@ -100,6 +102,23 @@ const TopBar = ({
          </div>
 
          <div className="flex items-center space-x-3 sm:space-x-6">
+            {/* Test Mode Toggle - Desktop Only */}
+            <div className="hidden lg:flex items-center space-x-3">
+               <span className="text-sm text-gray-600 font-medium">
+                  Test mode
+               </span>
+               <button
+                  onClick={onTestModeToggle}
+                  className={`relative w-11 h-6 rounded-full transition-all duration-200 ${
+                     testMode ? "bg-purple-600" : "bg-gray-300"
+                  }`}>
+                  <div
+                     className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-transform duration-200 ${
+                        testMode ? "translate-x-6" : "translate-x-1"
+                     }`}></div>
+               </button>
+            </div>
+
             {/* Notifications */}
             <div className="relative">
                <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors relative">

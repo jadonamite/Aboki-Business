@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
    IoLogOutOutline,
    IoSettingsSharp,
@@ -71,6 +71,23 @@ const Sidebar = ({
    onTestModeToggle,
 }) => {
    const router = useRouter();
+   const [isMobileScreen, setIsMobileScreen] = useState(false);
+
+   // Check screen size on client side only
+   useEffect(() => {
+      const checkScreenSize = () => {
+         setIsMobileScreen(window.innerWidth < 1024);
+      };
+
+      // Initial check
+      checkScreenSize();
+
+      // Add event listener
+      window.addEventListener("resize", checkScreenSize);
+
+      // Cleanup
+      return () => window.removeEventListener("resize", checkScreenSize);
+   }, []);
 
    const navItems = [
       {
@@ -139,8 +156,8 @@ const Sidebar = ({
             )}
          </div>
 
-         {/* Test Mode Toggle - Show on mobile or when collapsed */}
-         {(isMobile || window.innerWidth < 1024) && (
+         {/* Test Mode Toggle - Show ONLY on mobile screens */}
+         {isMobileScreen && (
             <TestModeToggle
                testMode={testMode}
                onToggle={onTestModeToggle}
