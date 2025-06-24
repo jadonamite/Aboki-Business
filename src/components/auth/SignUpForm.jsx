@@ -1,7 +1,8 @@
 // src/components/auth/SignUpForm.jsx
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Input, Checkbox, ToastContainer } from "../ui";
+import { Button, Input, Checkbox } from "../ui";
+import { ToastContainer } from "../ui/ToastContainer";
 import AuthLayout from "./AuthLayout";
 import { useForm } from "../../hooks/useForm";
 import { validateSignUp } from "../../utils/validation";
