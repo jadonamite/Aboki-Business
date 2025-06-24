@@ -8,9 +8,11 @@ import {
    CogIcon,
    ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
+import { useRouter } from "next/router";
 
 const ProfileDropdown = ({ isOpen, onClose, user, onLogout }) => {
    const dropdownRef = useRef(null);
+   const router = useRouter();
 
    // Close dropdown when clicking outside
    useEffect(() => {
@@ -53,7 +55,7 @@ const ProfileDropdown = ({ isOpen, onClose, user, onLogout }) => {
             Profile
          </a>
          <a
-            href="/settings"
+            onClick={() => router.push("/settings")}
             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
             <CogIcon className="w-4 h-4 mr-3" />
             Settings

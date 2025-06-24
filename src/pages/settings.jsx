@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import DashboardLayout from "../components/Layout/DashboardLayout";
 import { useAuth } from "../hooks/useAuth";
 import { useToast } from "../hooks/useToast";
@@ -62,7 +61,7 @@ const ProfileSettings = ({ user, onUpdate, loading }) => {
    // Check for changes
    useEffect(() => {
       if (user) {
-         const hasChanged = 
+         const hasChanged =
             formData.firstName !== user.firstName ||
             formData.lastName !== user.lastName ||
             formData.email !== user.email ||
@@ -73,9 +72,9 @@ const ProfileSettings = ({ user, onUpdate, loading }) => {
    }, [formData, user]);
 
    const handleInputChange = (field, value) => {
-      setFormData(prev => ({
+      setFormData((prev) => ({
          ...prev,
-         [field]: value
+         [field]: value,
       }));
    };
 
@@ -108,7 +107,9 @@ const ProfileSettings = ({ user, onUpdate, loading }) => {
                <input
                   type="text"
                   value={formData.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  onChange={(e) =>
+                     handleInputChange("firstName", e.target.value)
+                  }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your first name"
                />
@@ -120,7 +121,9 @@ const ProfileSettings = ({ user, onUpdate, loading }) => {
                <input
                   type="text"
                   value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  onChange={(e) =>
+                     handleInputChange("lastName", e.target.value)
+                  }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your last name"
                />
@@ -132,7 +135,7 @@ const ProfileSettings = ({ user, onUpdate, loading }) => {
                <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your email"
                />
@@ -144,7 +147,9 @@ const ProfileSettings = ({ user, onUpdate, loading }) => {
                <input
                   type="tel"
                   value={formData.phoneNumber}
-                  onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                  onChange={(e) =>
+                     handleInputChange("phoneNumber", e.target.value)
+                  }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your phone number"
                />
@@ -156,7 +161,9 @@ const ProfileSettings = ({ user, onUpdate, loading }) => {
                <input
                   type="text"
                   value={formData.businessName}
-                  onChange={(e) => handleInputChange('businessName', e.target.value)}
+                  onChange={(e) =>
+                     handleInputChange("businessName", e.target.value)
+                  }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter your business name"
                />
@@ -164,23 +171,36 @@ const ProfileSettings = ({ user, onUpdate, loading }) => {
          </div>
          <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="flex justify-end space-x-3">
-               <button 
+               <button
                   onClick={handleCancel}
                   disabled={!hasChanges || loading}
                   className="px-6 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   Cancel
                </button>
-               <button 
+               <button
                   onClick={handleSubmit}
                   disabled={!hasChanges || loading}
                   className="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
                   {loading && (
-                     <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                     <svg
+                        className="animate-spin h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24">
+                        <circle
+                           className="opacity-25"
+                           cx="12"
+                           cy="12"
+                           r="10"
+                           stroke="currentColor"
+                           strokeWidth="4"></circle>
+                        <path
+                           className="opacity-75"
+                           fill="currentColor"
+                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                      </svg>
                   )}
-                  <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+                  <span>{loading ? "Saving..." : "Save Changes"}</span>
                </button>
             </div>
          </div>
@@ -354,35 +374,72 @@ const SettingsPage = () => {
    const { user, logout, updateUser } = useAuth();
    const { toasts, showSuccess, showError, hideToast } = useToast();
    const [loading, setLoading] = useState(false);
-   const router = useRouter();
+   const [mounted, setMounted] = useState(false);
 
-   const handleLogout = () => {
+   // Handle client-side mounting
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
+   const handleLogout = async () => {
       logout();
-      router.push('/auth/signin');
+      if (mounted && typeof window !== "undefined") {
+         // Use dynamic import to avoid SSR issues
+         const { default: Router } = await import("next/router");
+         Router.push("/auth/signin");
+      }
    };
 
    const handleUpdateProfile = async (updatedData) => {
       setLoading(true);
       try {
          const result = await updateUser(updatedData);
-         
+
          if (result.success) {
-            showSuccess('✅ Profile updated successfully!');
+            showSuccess("✅ Profile updated successfully!");
          } else {
             showError(`❌ Failed to update profile: ${result.error}`);
          }
       } catch (error) {
-         console.error('Profile update error:', error);
-         showError('❌ An unexpected error occurred while updating your profile.');
+         console.error("Profile update error:", error);
+         showError(
+            "❌ An unexpected error occurred while updating your profile."
+         );
       } finally {
          setLoading(false);
       }
    };
 
-   // Redirect if not authenticated
-   if (!user) {
-      router.push('/auth/signin');
-      return null;
+   // Handle redirect if not authenticated
+   useEffect(() => {
+      const handleRedirect = async () => {
+         if (mounted && !user && typeof window !== "undefined") {
+            const { default: Router } = await import("next/router");
+            Router.push("/auth/signin");
+         }
+      };
+      handleRedirect();
+   }, [mounted, user]);
+
+   // Show loading during SSR or while checking auth
+   if (!mounted || !user) {
+      return (
+         <>
+            <Head>
+               <title>Settings - Aboki</title>
+               <meta
+                  name="description"
+                  content="Manage your account settings"
+               />
+            </Head>
+            <div className="min-h-screen flex items-center justify-center">
+               <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading...</p>
+               </div>
+            </div>
+         </>
+      );
    }
 
    return (
@@ -406,8 +463,8 @@ const SettingsPage = () => {
 
                {/* Settings Sections */}
                <div className="space-y-8">
-                  <ProfileSettings 
-                     user={user} 
+                  <ProfileSettings
+                     user={user}
                      onUpdate={handleUpdateProfile}
                      loading={loading}
                   />

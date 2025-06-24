@@ -1,25 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import DashboardLayout from "../components/Layout/DashboardLayout";
+import { useAuth } from "../hooks/useAuth";
 import {
    MagnifyingGlassIcon,
    FunnelIcon,
    ArrowDownTrayIcon,
    CalendarIcon,
 } from "@heroicons/react/24/outline";
-import { SiBitcoin, SiEthereum, SiTether } from "react-icons/si";
-import { MdDashboard, MdOutlineHistory } from "react-icons/md";
 
 const TransactionFilters = ({ onFilterChange }) => {
    const [activeFilter, setActiveFilter] = useState("all");
-
    const filters = [
       { id: "all", label: "All Transactions", count: 24 },
       { id: "success", label: "Successful", count: 18 },
       { id: "pending", label: "Pending", count: 4 },
       { id: "failed", label: "Failed", count: 2 },
    ];
-
    return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -32,7 +29,6 @@ const TransactionFilters = ({ onFilterChange }) => {
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                />
             </div>
-
             {/* Action Buttons */}
             <div className="flex items-center space-x-3">
                <button className="flex items-center space-x-2 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
@@ -49,7 +45,6 @@ const TransactionFilters = ({ onFilterChange }) => {
                </button>
             </div>
          </div>
-
          {/* Filter Tabs */}
          <div className="flex space-x-1 mt-6 bg-gray-100 rounded-lg p-1">
             {filters.map((filter) => (
@@ -73,7 +68,7 @@ const TransactionFilters = ({ onFilterChange }) => {
    );
 };
 
-const TransactionCard = ({ transaction }) => {
+const TransactionCard = ({ transaction, icons }) => {
    const statusColors = {
       Success: "bg-emerald-100 text-emerald-800 border border-emerald-200",
       Pending: "bg-yellow-100 text-yellow-800 border border-yellow-200",
@@ -81,12 +76,32 @@ const TransactionCard = ({ transaction }) => {
    };
 
    const getCryptoIcon = (asset) => {
-      const iconMap = {
-         Bitcoin: { icon: SiBitcoin, color: "from-orange-400 to-yellow-500" },
-         Ethereum: { icon: SiEthereum, color: "from-blue-400 to-purple-500" },
-         USDT: { icon: SiTether, color: "from-green-400 to-teal-500" },
-      };
+      if (!icons) {
+         // Fallback icons when react-icons haven't loaded yet
+         const iconMap = {
+            Bitcoin: { symbol: "₿", color: "from-orange-400 to-yellow-500" },
+            Ethereum: { symbol: "Ξ", color: "from-blue-400 to-purple-500" },
+            USDT: { symbol: "₮", color: "from-green-400 to-teal-500" },
+         };
+         return (
+            iconMap[asset] || {
+               symbol: "●",
+               color: "from-gray-400 to-gray-500",
+            }
+         );
+      }
 
+      const iconMap = {
+         Bitcoin: {
+            icon: icons.SiBitcoin,
+            color: "from-orange-400 to-yellow-500",
+         },
+         Ethereum: {
+            icon: icons.SiEthereum,
+            color: "from-blue-400 to-purple-500",
+         },
+         USDT: { icon: icons.SiTether, color: "from-green-400 to-teal-500" },
+      };
       return (
          iconMap[asset] || { symbol: "●", color: "from-gray-400 to-gray-500" }
       );
@@ -100,7 +115,11 @@ const TransactionCard = ({ transaction }) => {
             <div className="flex items-center space-x-3">
                <div
                   className={`w-10 h-10 rounded-full bg-gradient-to-br ${crypto.color} flex items-center justify-center text-white font-bold shadow-sm`}>
-                  {crypto.symbol}
+                  {crypto.icon ? (
+                     <crypto.icon className="w-5 h-5" />
+                  ) : (
+                     crypto.symbol
+                  )}
                </div>
                <div>
                   <h3 className="font-semibold text-gray-900">
@@ -116,7 +135,6 @@ const TransactionCard = ({ transaction }) => {
                {transaction.status}
             </span>
          </div>
-
          <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
                <p className="text-gray-500 mb-1">Amount</p>
@@ -144,10 +162,42 @@ const TransactionCard = ({ transaction }) => {
 };
 
 const TransactionsPage = () => {
+   const { user, logout } = useAuth();
    const [filteredTransactions, setFilteredTransactions] = useState([]);
+   const [mounted, setMounted] = useState(false);
+   const [icons, setIcons] = useState(null);
 
-   // Mock user data - replace with your auth
-   const user = { firstName: "Jane", lastName: "Doe", email: "jane@aboki.com" };
+   // Handle client-side mounting
+   useEffect(() => {
+      setMounted(true);
+   }, []);
+
+   // Load react-icons dynamically on client side
+   useEffect(() => {
+      const loadIcons = async () => {
+         try {
+            const { SiBitcoin, SiEthereum, SiTether } = await import(
+               "react-icons/si"
+            );
+            const { MdDashboard, MdOutlineHistory } = await import(
+               "react-icons/md"
+            );
+            setIcons({
+               SiBitcoin,
+               SiEthereum,
+               SiTether,
+               MdDashboard,
+               MdOutlineHistory,
+            });
+         } catch (error) {
+            console.error("Failed to load icons:", error);
+         }
+      };
+
+      if (mounted) {
+         loadIcons();
+      }
+   }, [mounted]);
 
    // Mock transactions data
    const allTransactions = [
@@ -204,9 +254,45 @@ const TransactionsPage = () => {
       }
    };
 
-   const handleLogout = () => {
-      // Your logout logic
+   const handleLogout = async () => {
+      logout();
+      if (mounted && typeof window !== "undefined") {
+         const { default: Router } = await import("next/router");
+         Router.push("/auth/signin");
+      }
    };
+
+   // Handle redirect if not authenticated
+   useEffect(() => {
+      const handleRedirect = async () => {
+         if (mounted && !user && typeof window !== "undefined") {
+            const { default: Router } = await import("next/router");
+            Router.push("/auth/signin");
+         }
+      };
+      handleRedirect();
+   }, [mounted, user]);
+
+   // Show loading during SSR or while checking auth
+   if (!mounted || !user) {
+      return (
+         <>
+            <Head>
+               <title>Transactions - Aboki</title>
+               <meta
+                  name="description"
+                  content="View and manage your transactions"
+               />
+            </Head>
+            <div className="min-h-screen flex items-center justify-center">
+               <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading transactions...</p>
+               </div>
+            </div>
+         </>
+      );
+   }
 
    return (
       <>
@@ -217,7 +303,6 @@ const TransactionsPage = () => {
                content="View and manage your transactions"
             />
          </Head>
-
          <DashboardLayout user={user} onLogout={handleLogout}>
             <div className="p-6">
                {/* Page Header */}
@@ -229,10 +314,8 @@ const TransactionsPage = () => {
                      View and manage all your crypto transactions
                   </p>
                </div>
-
                {/* Filters */}
                <TransactionFilters onFilterChange={handleFilterChange} />
-
                {/* Transactions Grid */}
                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {(filteredTransactions.length > 0
@@ -242,15 +325,19 @@ const TransactionsPage = () => {
                      <TransactionCard
                         key={transaction.id}
                         transaction={transaction}
+                        icons={icons}
                      />
                   ))}
                </div>
-
                {/* Empty State */}
                {filteredTransactions.length === 0 && (
                   <div className="text-center py-12">
                      <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                        <span className="text-2xl">{MdDashboard}</span>
+                        {icons?.MdDashboard ? (
+                           <icons.MdDashboard className="text-2xl text-gray-400" />
+                        ) : (
+                           <span className="text-2xl">📊</span>
+                        )}
                      </div>
                      <h3 className="text-lg font-medium text-gray-900 mb-2">
                         No transactions found
