@@ -83,12 +83,12 @@ const SignUpForm = () => {
       showInfo(
          `
    Password Requirements:
-   • At least 8 characters long
+   • At least 8 characters long 
    • Contains uppercase letter
    • Contains lowercase letter  
    • Contains at least one number
  `,
-         6000
+         4000
       );
    };
 
