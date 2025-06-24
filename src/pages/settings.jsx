@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import DashboardLayout from "../components/Layout/DashboardLayout";
+import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/useToast";
+import { ToastContainer } from "../components/ui/ToastContainer";
 import {
    UserCircleIcon,
    KeyIcon,
@@ -30,14 +34,66 @@ const SettingsSection = ({ title, description, icon: Icon, children }) => {
    );
 };
 
-const ProfileSettings = () => {
+const ProfileSettings = ({ user, onUpdate, loading }) => {
    const [formData, setFormData] = useState({
-      firstName: "Jane",
-      lastName: "Doe",
-      email: "jane@aboki.com",
-      phone: "+234 801 234 5678",
-      company: "FlyMond",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      businessName: "",
    });
+
+   const [hasChanges, setHasChanges] = useState(false);
+
+   // Initialize form data when user changes
+   useEffect(() => {
+      if (user) {
+         const newFormData = {
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.email || "",
+            phoneNumber: user.phoneNumber || "",
+            businessName: user.businessName || "",
+         };
+         setFormData(newFormData);
+      }
+   }, [user]);
+
+   // Check for changes
+   useEffect(() => {
+      if (user) {
+         const hasChanged = 
+            formData.firstName !== user.firstName ||
+            formData.lastName !== user.lastName ||
+            formData.email !== user.email ||
+            formData.phoneNumber !== user.phoneNumber ||
+            formData.businessName !== user.businessName;
+         setHasChanges(hasChanged);
+      }
+   }, [formData, user]);
+
+   const handleInputChange = (field, value) => {
+      setFormData(prev => ({
+         ...prev,
+         [field]: value
+      }));
+   };
+
+   const handleSubmit = () => {
+      onUpdate(formData);
+   };
+
+   const handleCancel = () => {
+      if (user) {
+         setFormData({
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.email || "",
+            phoneNumber: user.phoneNumber || "",
+            businessName: user.businessName || "",
+         });
+      }
+   };
 
    return (
       <SettingsSection
@@ -52,10 +108,9 @@ const ProfileSettings = () => {
                <input
                   type="text"
                   value={formData.firstName}
-                  onChange={(e) =>
-                     setFormData({ ...formData, firstName: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your first name"
                />
             </div>
             <div>
@@ -65,10 +120,9 @@ const ProfileSettings = () => {
                <input
                   type="text"
                   value={formData.lastName}
-                  onChange={(e) =>
-                     setFormData({ ...formData, lastName: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your last name"
                />
             </div>
             <div>
@@ -78,46 +132,55 @@ const ProfileSettings = () => {
                <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) =>
-                     setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your email"
                />
             </div>
             <div>
                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone
+                  Phone Number
                </label>
                <input
                   type="tel"
-                  value={formData.phone}
-                  onChange={(e) =>
-                     setFormData({ ...formData, phone: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  value={formData.phoneNumber}
+                  onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your phone number"
                />
             </div>
             <div className="md:col-span-2">
                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company
+                  Business Name
                </label>
                <input
                   type="text"
-                  value={formData.company}
-                  onChange={(e) =>
-                     setFormData({ ...formData, company: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  value={formData.businessName}
+                  onChange={(e) => handleInputChange('businessName', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your business name"
                />
             </div>
          </div>
          <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="flex justify-end space-x-3">
-               <button className="px-6 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+               <button 
+                  onClick={handleCancel}
+                  disabled={!hasChanges || loading}
+                  className="px-6 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   Cancel
                </button>
-               <button className="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                  Save Changes
+               <button 
+                  onClick={handleSubmit}
+                  disabled={!hasChanges || loading}
+                  className="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+                  {loading && (
+                     <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                     </svg>
+                  )}
+                  <span>{loading ? 'Saving...' : 'Save Changes'}</span>
                </button>
             </div>
          </div>
@@ -146,7 +209,8 @@ const SecuritySettings = () => {
                      </label>
                      <input
                         type="password"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Enter current password"
                      />
                   </div>
                   <div>
@@ -155,7 +219,8 @@ const SecuritySettings = () => {
                      </label>
                      <input
                         type="password"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Enter new password"
                      />
                   </div>
                </div>
@@ -196,10 +261,10 @@ const SecuritySettings = () => {
                         <DevicePhoneMobileIcon className="w-5 h-5 text-gray-400" />
                         <div>
                            <p className="text-sm font-medium text-gray-900">
-                              iPhone 13 Pro
+                              Current Device
                            </p>
                            <p className="text-xs text-gray-500">
-                              Lagos, Nigeria • Current session
+                              Lagos, Nigeria • Active now
                            </p>
                         </div>
                      </div>
@@ -259,7 +324,7 @@ const NotificationSettings = () => {
             ].map((item) => (
                <div
                   key={item.key}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                   <div>
                      <h4 className="font-medium text-gray-900">{item.label}</h4>
                      <p className="text-sm text-gray-600">{item.description}</p>
@@ -286,12 +351,39 @@ const NotificationSettings = () => {
 };
 
 const SettingsPage = () => {
-   // Mock user data - replace with your auth
-   const user = { firstName: "Jane", lastName: "Doe", email: "jane@aboki.com" };
+   const { user, logout, updateUser } = useAuth();
+   const { toasts, showSuccess, showError, hideToast } = useToast();
+   const [loading, setLoading] = useState(false);
+   const router = useRouter();
 
    const handleLogout = () => {
-      // Your logout logic
+      logout();
+      router.push('/auth/signin');
    };
+
+   const handleUpdateProfile = async (updatedData) => {
+      setLoading(true);
+      try {
+         const result = await updateUser(updatedData);
+         
+         if (result.success) {
+            showSuccess('✅ Profile updated successfully!');
+         } else {
+            showError(`❌ Failed to update profile: ${result.error}`);
+         }
+      } catch (error) {
+         console.error('Profile update error:', error);
+         showError('❌ An unexpected error occurred while updating your profile.');
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   // Redirect if not authenticated
+   if (!user) {
+      router.push('/auth/signin');
+      return null;
+   }
 
    return (
       <>
@@ -314,12 +406,19 @@ const SettingsPage = () => {
 
                {/* Settings Sections */}
                <div className="space-y-8">
-                  <ProfileSettings />
+                  <ProfileSettings 
+                     user={user} 
+                     onUpdate={handleUpdateProfile}
+                     loading={loading}
+                  />
                   <SecuritySettings />
                   <NotificationSettings />
                </div>
             </div>
          </DashboardLayout>
+
+         {/* Toast Container */}
+         <ToastContainer toasts={toasts} onHideToast={hideToast} />
       </>
    );
 };

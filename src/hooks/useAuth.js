@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
    const [loading, setLoading] = useState(true);
 
    // Mock user database (replace with real API calls)
-   const mockUsers = [
+   const [mockUsers, setMockUsers] = useState([
       {
          id: 1,
          email: "admin@aboki.com",
@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
          firstName: "Admin",
          lastName: "User",
          businessName: "Aboki Business",
+         phoneNumber: "+234 801 234 5678",
       },
       {
          id: 2,
@@ -30,8 +31,38 @@ export const AuthProvider = ({ children }) => {
          firstName: "Test",
          lastName: "User",
          businessName: "Test Company",
+         phoneNumber: "+234 901 234 5678",
       },
-   ];
+   ]);
+
+   const updateUser = async (updatedData) => {
+      try {
+         if (!user) return { success: false, error: "No user logged in" };
+
+         // Simulate API delay
+         await new Promise((resolve) => setTimeout(resolve, 1000));
+
+         // Update in mock database
+         const updatedUsers = mockUsers.map((u) =>
+            u.id === user.id ? { ...u, ...updatedData } : u
+         );
+         setMockUsers(updatedUsers);
+
+         // Update current user
+         const updatedUser = { ...user, ...updatedData };
+         setUser(updatedUser);
+
+         // Update localStorage
+         if (typeof window !== "undefined") {
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+         }
+
+         return { success: true, user: updatedUser };
+      } catch (error) {
+         console.error("Update user error:", error);
+         return { success: false, error: "Failed to update user information" };
+      }
+   };
 
    const login = async (email, password) => {
       try {
@@ -102,18 +133,20 @@ export const AuthProvider = ({ children }) => {
             firstName: userData.firstName,
             lastName: userData.lastName,
             businessName: userData.businessName,
+            phoneNumber: userData.phoneNumber,
             // In real app, password would be hashed
             password: userData.password,
          };
 
-         // Add to mock database (in real app, this would be an API call)
-         mockUsers.push(newUser);
+         // Add to mock database
+         setMockUsers(prev => [...prev, newUser]);
 
          console.log("New user registered:", newUser);
 
          return {
             success: true,
             message: "Account created successfully! Please sign in.",
+            user: newUser,
          };
       } catch (error) {
          console.error("Registration error:", error);
@@ -169,6 +202,7 @@ export const AuthProvider = ({ children }) => {
       register,
       logout,
       checkAuth,
+      updateUser,
    };
 
    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
