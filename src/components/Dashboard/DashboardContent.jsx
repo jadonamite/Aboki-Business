@@ -5,10 +5,11 @@ import WelcomeSection from "./WelcomeSection";
 import MetricsGrid from "./MetricsGrid";
 import ApiKeysSection from "./ApiKeysSection";
 import TransactionsTable from "./TransactionsTable";
+import { useAuth } from "../../hooks/useAuth";
 
 const DashboardContent = () => {
    const router = useRouter();
-   const [user, setUser] = useState(null);
+   const { user, logout, loading: authLoading } = useAuth();
    const [loading, setLoading] = useState(true);
    const [dashboardData, setDashboardData] = useState(null);
 
@@ -16,18 +17,17 @@ const DashboardContent = () => {
    useEffect(() => {
       const initializeDashboard = async () => {
          try {
-            // Replace with your auth logic
-            const userData = {
-               firstName: "Jane",
-               lastName: "Doe",
-               email: "jane@aboki.com",
-            };
+            // Check if user is authenticated
+            if (!authLoading && !user) {
+               router.push("/auth/signin");
+               return;
+            }
 
-            // Replace with your API calls
-            const data = await fetchDashboardData();
-
-            setUser(userData);
-            setDashboardData(data);
+            if (user) {
+               // Fetch dashboard data
+               const data = await fetchDashboardData();
+               setDashboardData(data);
+            }
          } catch (error) {
             console.error("Dashboard initialization failed:", error);
             router.push("/auth/signin");
@@ -37,11 +37,11 @@ const DashboardContent = () => {
       };
 
       initializeDashboard();
-   }, [router]);
+   }, [user, authLoading, router]);
 
    const handleLogout = async () => {
       try {
-         // Your logout logic here
+         logout();
          router.push("/auth/signin");
       } catch (error) {
          console.error("Logout failed:", error);
@@ -49,7 +49,7 @@ const DashboardContent = () => {
    };
 
    // Loading state
-   if (loading) {
+   if (loading || authLoading) {
       return (
          <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="text-center">
