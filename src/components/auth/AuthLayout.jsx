@@ -20,19 +20,6 @@ const AuthLayout = ({ children, title, subtitle }) => {
                <div className="absolute bottom-32 right-32 w-24 h-24 bg-white/10 rounded-full animate-bounce"></div>
                <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-white/10 rounded-full animate-ping"></div>
             </div>
-
-            {/* Content overlay */}
-            <div className="relative z-10 flex flex-col justify-center items-center text-stone-500 p-12">
-               {/* <div className="max-w-md text-center">
-                  <h1 className="text-4xl font-bold mb-6">
-                     Welcome to the Future of Crypto Business
-                  </h1>
-                  <p className="text-lg opacity-90 leading-relaxed">
-                     Empower your cryptocurrency operations with cutting-edge
-                     tools and seamless integration.
-                  </p>
-               </div> */}
-            </div>
          </div>
 
          {/* Right side - Form */}
