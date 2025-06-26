@@ -78,11 +78,7 @@ const TransactionCard = ({ transaction, icons }) => {
    const getCryptoIcon = (asset) => {
       if (!icons) {
          // Fallback icons when react-icons haven't loaded yet
-         const iconMap = {
-            Bitcoin: { symbol: "₿", color: "from-orange-400 to-yellow-500" },
-            Ethereum: { symbol: "Ξ", color: "from-blue-400 to-purple-500" },
-            USDT: { symbol: "₮", color: "from-green-400 to-teal-500" },
-         };
+
          return (
             iconMap[asset] || {
                symbol: "●",
