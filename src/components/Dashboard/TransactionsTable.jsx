@@ -2,6 +2,7 @@ import { MdDashboard } from "react-icons/md";
 import { SiBitcoin, SiEthereum, SiTether } from "react-icons/si";
 import { useRouter } from "next/router";
 
+
 const TransactionRow = ({ transaction }) => {
    const statusColors = {
       Success: "bg-emerald-100 text-emerald-800 border border-emerald-200",
@@ -19,7 +20,6 @@ const TransactionRow = ({ transaction }) => {
    //       iconMap[asset] || { symbol: "●", color: "from-gray-400 to-gray-500" }
    //    );
    // };
-   const router = useRouter();
 
    const crypto = iconMap[transaction.asset];
    const CryptoIcon = crypto?.icon;
@@ -67,6 +67,7 @@ const TransactionRow = ({ transaction }) => {
 };
 
 const TransactionsTable = ({ transactions = [] }) => {
+   const router = useRouter();
    return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
          <div className="p-6 border-b border-gray-100">
