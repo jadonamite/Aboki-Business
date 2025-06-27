@@ -88,7 +88,7 @@ const TopBar = ({
             <button
                onClick={onMobileMenuToggle}
                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
-               <Bars3Icon className="w-5 h-5" />
+               <Bars3Icon className="w-8 h-8" />
             </button>
             <button
                onClick={onSidebarToggle}
