@@ -8,7 +8,7 @@ const WelcomeSection = ({ user }) => {
    };
 
    return (
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-8 ">
          <div className="relative shrink-0">
             <img
                src="/default.jpeg"
