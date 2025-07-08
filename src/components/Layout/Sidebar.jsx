@@ -104,7 +104,7 @@ const Sidebar = ({
       },
       {
          name: "Exchange",
-         href: "#exchange",
+         href: "https://www.aboki.xyz/app",
          active: router.pathname === "#exchange",
          icon: RiExchangeDollarLine,
       },
